@@ -279,9 +279,12 @@ def main():
 
     now = datetime.now(MADRID_TZ)
     today = now.strftime("%Y-%m-%d")
-    page_id = now.strftime("%Y-%m-%d_%H%M")
-    generate_html(results, page_id)
-    generate_index()
+
+    any_news = any(arts for arts, err in results.values() if arts)
+    if any_news:
+        page_id = now.strftime("%Y-%m-%d_%H%M")
+        generate_html(results, page_id)
+        generate_index()
 
     message = format_message(results, has_errors, today)
     if message:

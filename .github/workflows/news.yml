@@ -43,6 +43,12 @@ jobs:
         with:
           path: docs/
 
+      - name: Save telegram message
+        uses: actions/upload-artifact@v4
+        with:
+          name: telegram-message
+          path: telegram_message.txt
+
   deploy:
     needs: check-news
     runs-on: ubuntu-latest
@@ -53,3 +59,19 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download telegram message
+        uses: actions/download-artifact@v4
+        with:
+          name: telegram-message
+
+      - name: Send Telegram notification
+        run: |
+          MESSAGE=$(cat telegram_message.txt)
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.BOT_TOKEN }}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{\"chat_id\": \"${{ secrets.CHAT_ID }}\", \"text\": \"${MESSAGE}\", \"disable_web_page_preview\": true}"

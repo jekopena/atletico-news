@@ -280,7 +280,9 @@ def main():
     generate_index()
 
     message = format_message(results, has_errors, today)
-    send_telegram(message)
+    with open("telegram_message.txt", "w") as f:
+        f.write(message)
+    print("Saved telegram message to telegram_message.txt")
 
     now = datetime.now(MADRID_TZ)
     save_last_run(now)

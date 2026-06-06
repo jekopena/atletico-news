@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 STATE_FILE = "last_run.json"
 TEMPLATE_DIR = "templates"
 DOCS_DIR = "docs"
+MADRID_TZ = timezone(timedelta(hours=2))
 
 BROWSER_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -276,7 +277,7 @@ def main():
             has_errors = True
             print(f"  {name}: ERROR - {e}")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(MADRID_TZ)
     today = now.strftime("%Y-%m-%d")
     page_id = now.strftime("%Y-%m-%d_%H%M")
     generate_html(results, page_id)
@@ -288,7 +289,7 @@ def main():
     else:
         print("No new news, skipping Telegram message")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(MADRID_TZ)
     save_last_run(now)
     print(f"Saved last_run: {now.isoformat()}")
 

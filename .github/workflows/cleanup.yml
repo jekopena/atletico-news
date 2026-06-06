@@ -63,8 +63,14 @@ jobs:
               items = []
               for page in pages:
                   filename = os.path.basename(page)
-                  date_str = filename.replace('.html', '')
-                  items.append(f'<li><a href=\"{filename}\">📅 {date_str} <span class=\"arrow\">→</span></a></li>')
+                  page_id = filename.replace('.html', '')
+                  try:
+                      from datetime import datetime
+                      dt = datetime.strptime(page_id, '%Y-%m-%d_%H%M')
+                      label = dt.strftime('%d/%m/%Y %H:%M')
+                  except ValueError:
+                      label = page_id
+                  items.append(f'<li><a href=\"{filename}\">📅 {label} <span class=\"arrow\">→</span></a></li>')
               content = f'<ul class=\"archive-list\">{\"  \".join(items)}</ul>'
           else:
               content = '<div class=\"empty\">No hay páginas generadas aún.</div>'

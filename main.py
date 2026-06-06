@@ -207,9 +207,14 @@ def generate_index():
         items = []
         for page in pages:
             filename = os.path.basename(page)
-            date_str = filename.replace(".html", "")
+            page_id = filename.replace(".html", "")
+            try:
+                dt = datetime.strptime(page_id, "%Y-%m-%d_%H%M")
+                label = dt.strftime("%d/%m/%Y %H:%M")
+            except ValueError:
+                label = page_id
             items.append(
-                f'<li><a href="{filename}">📅 {date_str} <span class="arrow">→</span></a></li>'
+                f'<li><a href="{filename}">📅 {label} <span class="arrow">→</span></a></li>'
             )
         content = f'<ul class="archive-list">{"".join(items)}</ul>'
     else:
@@ -271,8 +276,10 @@ def main():
             has_errors = True
             print(f"  {name}: ERROR - {e}")
 
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    generate_html(results, today)
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    page_id = now.strftime("%Y-%m-%d_%H%M")
+    generate_html(results, page_id)
     generate_index()
 
     message = format_message(results, has_errors, today)

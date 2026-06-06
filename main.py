@@ -231,20 +231,16 @@ def generate_index():
 
 def format_message(results, has_errors, date_str):
     lines = [f"⚽ Noticias del Atlético - {date_str}", ""]
-    any_news = False
     for source_name, (articles, error) in results.items():
         if error:
             lines.append(f"📰 {source_name}: ⚠️ Error")
         elif articles:
-            any_news = True
             lines.append(f"📰 {source_name}: {len(articles)} noticias")
         else:
             lines.append(f"📰 {source_name}: Sin noticias")
-    if any_news or has_errors:
-        lines.append("")
-        lines.append("🔗 Ver noticias: https://jekopena.github.io/atletico-news/")
-        return "\n".join(lines)
-    return None
+    lines.append("")
+    lines.append("🔗 Ver noticias: https://jekopena.github.io/atletico-news/")
+    return "\n".join(lines)
 
 
 def send_telegram(message):
@@ -284,10 +280,7 @@ def main():
     generate_index()
 
     message = format_message(results, has_errors, today)
-    if message:
-        send_telegram(message)
-    else:
-        print("No new news, skipping Telegram message")
+    send_telegram(message)
 
     now = datetime.now(MADRID_TZ)
     save_last_run(now)

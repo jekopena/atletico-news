@@ -1,0 +1,83 @@
+name: Cleanup old pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      before_date:
+        description: "Borrar páginas anteriores a esta fecha (YYYY-MM-DD)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine cutoff date
+        id: cutoff
+        run: |
+          if [ -n "${{ github.event.inputs.before_date }}" ]; then
+            echo "date=${{ github.event.inputs.before_date }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "date=$(date -d yesterday +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Delete old HTML pages
+        run: |
+          BEFORE="${{ steps.cutoff.outputs.date }}"
+          echo "Deleting pages before: $BEFORE"
+          DELETED=0
+          for f in docs/*.html; do
+            [ -f "$f" ] || continue
+            BASENAME=$(basename "$f" .html)
+            if [ "$BASENAME" = "index" ]; then
+              continue
+            fi
+            if [[ "$BASENAME" < "$BEFORE" ]]; then
+              echo "Deleting $f"
+              rm "$f"
+              DELETED=$((DELETED + 1))
+            fi
+          done
+          echo "Deleted $DELETED files"
+
+      - name: Regenerate index
+        run: |
+          python -c "
+          import glob, os
+
+          DOCS_DIR = 'docs'
+          TEMPLATE = 'templates/index.html'
+
+          with open(TEMPLATE) as f:
+              template = f.read()
+
+          pages = sorted(glob.glob(os.path.join(DOCS_DIR, '*.html')), reverse=True)
+          pages = [p for p in pages if not p.endswith('index.html')]
+
+          if pages:
+              items = []
+              for page in pages:
+                  filename = os.path.basename(page)
+                  date_str = filename.replace('.html', '')
+                  items.append(f'<li><a href=\"{filename}\">📅 {date_str} <span class=\"arrow\">→</span></a></li>')
+              content = f'<ul class=\"archive-list\">{\"  \".join(items)}</ul>'
+          else:
+              content = '<div class=\"empty\">No hay páginas generadas aún.</div>'
+
+          html = template.replace('{content}', content)
+          with open(os.path.join(DOCS_DIR, 'index.html'), 'w') as f:
+              f.write(html)
+          print('Index regenerated')
+          "
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git diff --cached --quiet || git commit -m "Cleanup pages before ${{ steps.cutoff.outputs.date }}" && git push

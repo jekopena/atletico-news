@@ -38,8 +38,7 @@ SOURCES = [
     {
         "name": "Marca",
         "type": "rss",
-        "url": "https://www.marca.com/rss/portada.xml",
-        "filter": "/futbol/atletico/",
+        "url": "https://www.marca.com/rss/futbol/atletico.xml",
     },
 ]
 

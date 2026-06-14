@@ -108,7 +108,9 @@ def extract_image(entry, source_key):
 
 
 def fetch_rss(source, last_run):
-    feed = feedparser.parse(source["url"])
+    resp = requests.get(source["url"], headers=BROWSER_HEADERS, timeout=30)
+    resp.raise_for_status()
+    feed = feedparser.parse(resp.content)
     articles = []
     url_filter = source.get("filter")
     source_key = SOURCE_KEY_MAP.get(source["name"], "")

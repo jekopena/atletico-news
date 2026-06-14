@@ -67,55 +67,7 @@
             color: #666;
             font-size: 0.9rem;
         }
-        .toggle-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        .toggle-bar label {
-            font-size: 0.95rem;
-            color: #555;
-            cursor: pointer;
-            user-select: none;
-        }
-        .toggle-switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .toggle-slider {
-            position: absolute;
-            inset: 0;
-            background: #ccc;
-            border-radius: 24px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .toggle-slider::before {
-            content: "";
-            position: absolute;
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
-        .toggle-switch input:checked + .toggle-slider {
-            background: #CE3524;
-        }
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(20px);
-        }
+
     </style>
 </head>
 <body>
@@ -124,13 +76,6 @@
         <div class="subtitle">Archivo de noticias del Atlético de Madrid</div>
     </div>
     <div class="container">
-        <div class="toggle-bar">
-            <label class="toggle-switch">
-                <input type="checkbox" id="toggle-sources">
-                <span class="toggle-slider"></span>
-            </label>
-            <label for="toggle-sources">Ver fuentes originales</label>
-        </div>
         {content}
     </div>
     <div class="footer">
